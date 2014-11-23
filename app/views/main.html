@@ -1,11 +1,10 @@
 <div class="row marketing">
   <h4>Hello {{ apiMe }}</h4>
-  <p>
-    {{ loginStatus }}
-  </p>
+
+  <p>Below the list of suggested movies</p>
 
   <h4>Movies</h4>
-  <p>
-    None
-  </p>
+  <div ng-repeat="s in suggestion">
+    <p>{{ s.mid }} seen {{ s.counter }} times</p>
+  </div>
 </div>

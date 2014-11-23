@@ -175,11 +175,7 @@ angular.module('fbsuggestApp')
             console.debug(JSON.stringify(myMoviesList));
             console.debug("suggestion");
             console.debug(JSON.stringify(suggestion));
-            _.forEach(suggestion, function (obj) {
-              //$('#movie_list').append('<fb:profile-pic uid="'+obj.mid+'" useyou="false"></fb:profile-pic>');
-              $('#movie_list').append('<fb:profile-pic type="large" uid="' + obj.mid + '" useyou="false"></fb:profile-pic>');
-              $scope.mid = obj.mid;
-            });
+            $scope.suggestion = suggestion;
             FB.XFBML.parse();
           }
         })
