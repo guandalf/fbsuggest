@@ -4,7 +4,9 @@
   <p>Below the list of suggested movies</p>
 
   <h4>Movies</h4>
-  <div ng-repeat="s in suggestion">
-    <p>{{ s.mid }} seen {{ s.counter }} times</p>
-  </div>
+  <ul>
+    <li ng-repeat="s in suggestion">
+      <fb:profile-pic type="large" uid="{{ s.mid }}" useyou="false"></fb:profile-pic>
+    </li>
+  </ul>
 </div>

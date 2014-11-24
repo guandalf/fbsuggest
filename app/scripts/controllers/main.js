@@ -141,7 +141,10 @@ angular.module('fbsuggestApp')
        */
       function updateApiMe() {
         console.debug('UpdateApiMe');
-        ezfb.api('/me?fields=id,first_name', function (response) {
+        ezfb.api('/me', {fields: "id,first_name"}, function (response) {
+          if(!response || response.error) {
+            $scope.login();
+          }
           console.debug(JSON.stringify(response));
           myId = response.id;
           $scope.apiMe = response.first_name;
