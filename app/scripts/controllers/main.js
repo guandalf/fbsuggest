@@ -183,7 +183,6 @@ angular.module('fbsuggestApp')
           }
         })
       }
-
       console.debug('Starting up');
       updateLoginStatus(updateApiMe);
 
