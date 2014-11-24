@@ -13,6 +13,16 @@ angular.module('fbsuggestApp')
       var myMoviesList = [];
       var myId;
 
+      /**
+       * Update api('/me') result
+       */
+      function updateApiMe() {
+        console.debug('UpdateApiMe');
+        ezfb.api('/me', function (res) {
+          $scope.apiMe = res;
+        });
+      }
+
       $scope.login = function () {
         /**
          * Calling FB.login with required permissions specified
@@ -22,10 +32,11 @@ angular.module('fbsuggestApp')
           /**
            * no manual $scope.$apply, I got that handled
            */
+          console.debug(JSON.stringify(res));
           if (res.authResponse) {
             updateLoginStatus(updateApiMe);
           }
-        }, {scope: 'email,user_likes'});
+        }, {scope: 'user_friends, user_actions.video'});
       };
 
       $scope.logout = function () {
@@ -54,26 +65,29 @@ angular.module('fbsuggestApp')
       function updateLoginStatus(more) {
         ezfb.getLoginStatus(function (res) {
           $scope.loginStatus = res;
-
           (more || angular.noop)();
         });
       }
 
       function doRetrieveFriends(next) {
         console.debug('Friends:');
-        ezfb.api(next, function (response) {
-          var elements = response.data;
+        ezfb.api(next, function (res) {
+          console.debug(JSON.stringify(res));
+          if (!res || res.error) {
+            $scope.login();
+          }
+          var elements = res.data || [];
           for (var i = 0; i < elements.length; i++) {
             console.debug(JSON.stringify(elements[i]));
             var id = elements[i].id;
             myFriendsList.push(id);
           }
-          if (typeof response.paging != 'undefined' && typeof response.paging.next != 'undefined') {
-            console.debug(response.paging.next);
-            doRetrieveFriends(response.paging.next);
-          } else {
+          if (typeof res.paging != 'undefined' && typeof res.paging.next != 'undefined') {
+            console.debug(res.paging.next);
+            doRetrieveFriends(res.paging.next);
+          } /*else {
             doRetrieveMovies();
-          }
+          }*/
         })
       }
 
@@ -111,7 +125,11 @@ angular.module('fbsuggestApp')
       function doRetrieveMyMovies(next) {
         console.debug("next movie is " + next);
         ezfb.api(next, function (response) {
-          var elements = response.data;
+          console.debug(JSON.stringify(response));
+          if (!response || response.error) {
+            $scope.login();
+          }
+          var elements = response.data || [];
           for (var i = 0; i < elements.length; i++) {
             if (typeof elements[i].data.movie == 'undefined') {
               console.debug("skipping");
@@ -133,23 +151,6 @@ angular.module('fbsuggestApp')
             doWriteMyMovie({'uid': myId, 'movies': myMoviesList})
           }
 
-        });
-      }
-
-      /**
-       * Update api('/me') result
-       */
-      function updateApiMe() {
-        console.debug('UpdateApiMe');
-        ezfb.api('/me', {fields: "id,first_name"}, function (response) {
-          if(!response || response.error) {
-            $scope.login();
-          }
-          console.debug(JSON.stringify(response));
-          myId = response.id;
-          $scope.apiMe = response.first_name;
-          doRetrieveFriends('/me/friends');
-          doRetrieveMyMovies('/me/video.watches');
         });
       }
 
@@ -184,6 +185,6 @@ angular.module('fbsuggestApp')
         })
       }
       console.debug('Starting up');
-      updateLoginStatus(updateApiMe);
-
+      doRetrieveFriends('/me/friends');
+      //doRetrieveMyMovies('/me/video.watches');
     });
